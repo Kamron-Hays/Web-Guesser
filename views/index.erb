@@ -12,7 +12,7 @@
   <body>
     <h1>WebGuesser</h1>
     <p>
-      <p>I'm thinking of a number between 1 and 100. Try to guess it.</p>
+      <p><%= settings.intro %></p>
       <form>
         Your guess: <input type='text' name='guess' id='guess' autofocus>
         <input type='submit' value='Guess!'>
@@ -24,6 +24,10 @@
 
       <% if settings.show_number %>
         <p>The secret number is <%= settings.number %>.</p>
+      <% end %>
+
+      <% if settings.play_again != nil %>
+        <p><%= settings.play_again %></p>
       <% end %>
     </p>
   </body>
