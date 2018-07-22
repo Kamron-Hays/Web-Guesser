@@ -29,11 +29,11 @@ end
 
 def check_guess(guess)
   if guess > settings.number
-      settings.message += (guess - settings.number > 5) ? "Way too high!" : "Too high!"
+      settings.message += (guess - settings.number > 5) ? "<span id='way_off'>Way too high!</span>" : "<span id='off'>Too high!</span>"
     elsif guess < settings.number
-      settings.message += (settings.number - guess > 5) ? "Way too low!" : "Too low!"
+      settings.message += (settings.number - guess > 5) ? "<span id='way_off'>Way too low!</span>" : "<span id='off'>Too low!</span>"
     else
-      settings.message += "You got it right!"
+      settings.message += "<span id='correct'>You got it right!</span>"
       settings.show_number = true
     end
 end

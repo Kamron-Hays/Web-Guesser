@@ -1,13 +1,20 @@
 <html>
   <head>
     <title>WebGuesser</title>
+    <style>
+      #way_off { color: Crimson; }
+      #off { color: Tomato; }
+      #correct { color: Green; }
+      #guess { width: 75px; }
+      #guess:focus { outline: none }
+    </style>
   </head>
   <body>
     <h1>WebGuesser</h1>
     <p>
       <p>I'm thinking of a number between 1 and 100. Try to guess it.</p>
       <form>
-        Your guess: <input type='text' name='guess' autofocus>
+        Your guess: <input type='text' name='guess' id='guess' autofocus>
         <input type='submit' value='Guess!'>
       </form>
 
