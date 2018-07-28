@@ -13,21 +13,21 @@
     <h1>WebGuesser</h1>
     <p>
       <p><%= settings.intro %></p>
-      <form>
+      <form action="/" method="post">
         Your guess: <input type='text' name='guess' id='guess' autofocus>
         <input type='submit' value='Guess!'>
       </form>
 
-      <% if settings.message != nil %>
-        <p><%= settings.message %></p>
+      <% if session[:message] != nil %>
+        <p><%= session[:message] %></p>
       <% end %>
 
-      <% if settings.show_number %>
-        <p>The secret number is <%= settings.number %>.</p>
+      <% if session[:show_number] %>
+        <p>The secret number is <%= session[:number] %>.</p>
       <% end %>
 
-      <% if settings.play_again != nil %>
-        <p><%= settings.play_again %></p>
+      <% if session[:play_again] != nil %>
+        <p><%= session[:play_again] %></p>
       <% end %>
     </p>
   </body>

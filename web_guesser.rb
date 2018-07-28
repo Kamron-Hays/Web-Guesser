@@ -3,69 +3,70 @@
 require 'sinatra'
 require 'sinatra/reloader'
 
-# Generate a number between 0 and 99, then add 1 to it
-# to get a number between 1 and 100.
-set :init, true
-set :number, nil
-set :show_number, false
-set :message, nil
-set :play_again, nil
 set :max_guesses, 5
 set :intro, "I'm thinking of a number between 1 and 100. Try to guess it in #{settings.max_guesses} or fewer tries."
 # Multiple settings can also be set by passing a hash to set:
 # set :number => rand(1..100), :show_number => false, :message => nil
 
-@@remaining_guesses = settings.max_guesses
+enable :sessions
 
+# The HTML spec says GET requests should not change the state of the application.
 get '/' do
-  if settings.init
-    settings.number = rand(1..100)
-    settings.show_number = false
-    @@remaining_guesses = settings.max_guesses
-    settings.message = nil
-    settings.play_again = nil
-    settings.init = false
+  # Render the ERB template named 'index'
+  erb :index
+end
+
+# Use POST requests to change application state.
+post '/' do
+  if session[:init].nil?
+    session[:number] = rand(1..100)
+    session[:guesses_left] = settings.max_guesses
+    session[:show_number] = false
+    session[:message] = nil
+    session[:play_again] = nil
+    session[:init] = true
   end
 
   if params["guess"] != nil
     # The 'params' method returns a hash with the ERB form input (the guess).
-    guess = params["guess"].to_i
-    settings.message = "You guessed #{guess}. "
-    check_guess(guess)    
+    if params["guess"].downcase == "cheat"
+      session[:show_number] = !session[:show_number] # toggle cheat mode
+    else
+      guess = params["guess"].to_i
+      session[:message] = "You guessed #{guess}. "
+      check_guess(guess)
+    end
   end
 
-  if params["cheat"]
-    settings.show_number = true
-  end
-
-  # Render the ERB template named 'index' and create a local variable for the
-  # template named 'number', which has the same value as the 'number' variable
-  # from this server code.
-  #erb :index, :locals => {:number => number, :show_number => show_number, :message => message}
-  # Instead of passing local variables, just use settings, which are accessible inside the view.
-  erb :index
+  # Initiate a GET request to display the updated state.
+  redirect "/"
 end
 
 def check_guess(guess)
   correct_guess = false
-  @@remaining_guesses -= 1
+  session[:guesses_left] -= 1
 
-  if guess > settings.number
-    settings.message += (guess - settings.number > 5) ? "<span id='way_off'>Way too high!</span>" : "<span id='off'>Too high!</span>"
-  elsif guess < settings.number
-    settings.message += (settings.number - guess > 5) ? "<span id='way_off'>Way too low!</span>" : "<span id='off'>Too low!</span>"
+  if guess > session[:number]
+    session[:message] += (guess - session[:number] > 5) ? "<span id='way_off'>Way too high!</span>" : "<span id='off'>Too high!</span>"
+  elsif guess < session[:number]
+    session[:message] += (session[:number] - guess > 5) ? "<span id='way_off'>Way too low!</span>" : "<span id='off'>Too low!</span>"
   else
-    settings.message += "<span id='correct'>You got it right!</span>"
+    session[:message] += "<span id='correct'>You got it right!</span>"
     correct_guess = true
   end
 
-  if !correct_guess && @@remaining_guesses == 0
-    settings.message += " You've run out of guesses."
+  if !correct_guess
+    if session[:guesses_left] == 0
+      session[:message] += " You've run out of guesses."
+    else
+      guesses = session[:guesses_left] == 1 ? "guess" : "guesses"
+      session[:message] += " You have #{session[:guesses_left]} #{guesses} left."
+    end
   end
 
-  if correct_guess || @@remaining_guesses == 0
-    settings.show_number = true
-    settings.play_again = "Let's play again with a new number!"
-    settings.init = true
+  if correct_guess || session[:guesses_left] == 0
+    session[:show_number] = true
+    session[:play_again] = "Let's play again with a new number!"
+    session[:init] = nil
   end
 end
