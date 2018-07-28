@@ -1,7 +1,7 @@
 # This is called the server file.
 
 require 'sinatra'
-require 'sinatra/reloader'
+require 'sinatra/reloader' if development?
 
 set :max_guesses, 5
 set :intro, "I'm thinking of a number between 1 and 100. Try to guess it in #{settings.max_guesses} or fewer tries."
